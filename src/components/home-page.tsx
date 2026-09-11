@@ -300,6 +300,7 @@ export function HomePage() {
                         rows={visible}
                         sortKey={`${sort}:${sortDirection}`}
                         showUptime={showUptime}
+                        settings={settings}
                       />
                     ) : activeView === "cards" ? (
                       <NodeCards
@@ -318,6 +319,7 @@ export function HomePage() {
                           showResourceTotals:
                             settings?.showResourceTotals ?? true,
                           showTraffic: settings?.showCardTraffic ?? true,
+                          showPing: settings?.showCardPing ?? true,
                           showSwap: settings?.showCardSwap ?? true,
                           showUptime,
                         }}

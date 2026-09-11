@@ -10,6 +10,7 @@ import {
 } from "lucide-react";
 import type { ComponentType } from "react";
 import { LiveUptime } from "@/components/live-uptime";
+import { NodePing } from "@/components/node-ping";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
@@ -139,6 +140,44 @@ function UsageMetric({
   );
 }
 
+function NetworkMetric({
+  label,
+  down,
+  up,
+}: {
+  label: string;
+  down: string;
+  up: string;
+}) {
+  return (
+    <div className="flex min-w-0 items-center gap-2 text-xs">
+      <span className="shrink-0 text-muted-foreground">{label}</span>
+      <span
+        className="min-w-2 flex-1 border-b border-dotted border-border"
+        aria-hidden="true"
+      />
+      <span className="km-metric inline-flex min-w-0 items-center gap-2 font-medium tabular-nums">
+        <span
+          className="inline-flex min-w-0 items-center gap-1 text-status-online"
+          title={`${t("download")}: ${down}`}
+        >
+          <ArrowDown className="size-3 shrink-0" aria-hidden="true" />
+          <span className="sr-only">{t("download")}</span>
+          <span className="truncate">{down}</span>
+        </span>
+        <span
+          className="inline-flex min-w-0 items-center gap-1 text-data-accent"
+          title={`${t("upload")}: ${up}`}
+        >
+          <ArrowUp className="size-3 shrink-0" aria-hidden="true" />
+          <span className="sr-only">{t("upload")}</span>
+          <span className="truncate">{up}</span>
+        </span>
+      </span>
+    </div>
+  );
+}
+
 type NodeCardOptions = {
   showTags: boolean;
   showPrice: boolean;
@@ -146,6 +185,7 @@ type NodeCardOptions = {
   showResourceTotals: boolean;
   showTraffic: boolean;
   showSwap: boolean;
+  showPing: boolean;
   showUptime: boolean;
 };
 
@@ -377,51 +417,26 @@ export function NodeCards({
 
                 {options.showTraffic ? (
                   <>
-                    <Separator className="my-4" />
-
-                    <div className="grid grid-cols-2 gap-4">
-                      <div className="min-w-0">
-                        <p className="flex items-center gap-1 text-[10px] font-medium text-status-online">
-                          <ArrowDown className="size-3.5" />
-                          {t("download")}
-                        </p>
-                        <p className="km-metric mt-1 truncate text-base font-semibold text-foreground">
-                          {formatSpeed(row.netIn)}
-                        </p>
-                      </div>
-                      <div className="min-w-0 text-right">
-                        <p className="flex items-center justify-end gap-1 text-[10px] font-medium text-data-accent">
-                          <ArrowUp className="size-3.5" />
-                          {t("upload")}
-                        </p>
-                        <p className="km-metric mt-1 truncate text-base font-semibold text-foreground">
-                          {formatSpeed(row.netOut)}
-                        </p>
-                      </div>
+                    <Separator className="my-3" />
+                    <div className="space-y-2">
+                      <NetworkMetric
+                        label={t("colSpeed")}
+                        down={formatSpeed(row.netIn)}
+                        up={formatSpeed(row.netOut)}
+                      />
+                      <NetworkMetric
+                        label={t("colTraffic")}
+                        down={formatBytes(row.totalDown)}
+                        up={formatBytes(row.totalUp)}
+                      />
                     </div>
+                  </>
+                ) : null}
 
+                {options.showPing ? (
+                  <>
                     <Separator className="my-4" />
-
-                    <div className="grid grid-cols-2 gap-4">
-                      <div className="min-w-0">
-                        <p className="flex items-center gap-1 text-[10px] font-medium text-status-online">
-                          <ArrowDown className="size-3.5" />
-                          {t("totalDownload")}
-                        </p>
-                        <p className="km-metric mt-1 truncate text-sm font-semibold text-foreground">
-                          {formatBytes(row.totalDown)}
-                        </p>
-                      </div>
-                      <div className="min-w-0 text-right">
-                        <p className="flex items-center justify-end gap-1 text-[10px] font-medium text-data-accent">
-                          <ArrowUp className="size-3.5" />
-                          {t("totalUpload")}
-                        </p>
-                        <p className="km-metric mt-1 truncate text-sm font-semibold text-foreground">
-                          {formatBytes(row.totalUp)}
-                        </p>
-                      </div>
-                    </div>
+                    <NodePing uuid={row.uuid} />
                   </>
                 ) : null}
               </CardContent>

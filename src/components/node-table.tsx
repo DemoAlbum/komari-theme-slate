@@ -7,34 +7,28 @@ import {
 import { Server } from "lucide-react";
 import { type ReactNode, useEffect, useMemo } from "react";
 import { LiveUptime } from "@/components/live-uptime";
+import { NodePing } from "@/components/node-ping";
 import { Progress } from "@/components/ui/progress";
-import { formatSpeed } from "@/lib/format";
+import { formatBytes, formatSpeed } from "@/lib/format";
 import { t } from "@/lib/i18n";
 import type { NodeRow } from "@/lib/nodes";
 import { regionToFlagEmoji } from "@/lib/region";
+import type { ThemeSettings } from "@/lib/schemas";
 import { cn } from "@/lib/utils";
 
 const columnHelper = legacyCreateColumnHelper<NodeRow>();
 
-const TABLE_COLUMNS_WITH_UPTIME = [
-  { id: "name", width: "24%" },
-  { id: "status", width: "6%" },
-  { id: "system", width: "6%" },
-  { id: "uptime", width: "9%" },
-  { id: "cpu", width: "11%" },
-  { id: "memory", width: "11%" },
-  { id: "disk", width: "11%" },
-  { id: "speed", width: "22%" },
-] as const;
-
-const TABLE_COLUMNS_WITHOUT_UPTIME = [
-  { id: "name", width: "23%" },
-  { id: "status", width: "6%" },
-  { id: "system", width: "6%" },
-  { id: "cpu", width: "14%" },
-  { id: "memory", width: "14%" },
-  { id: "disk", width: "14%" },
-  { id: "speed", width: "23%" },
+const TABLE_COLUMNS = [
+  { id: "name", width: 220, setting: "showTableName" },
+  { id: "online", width: 60, setting: "showTableStatus" },
+  { id: "system", width: 60, setting: "showTableSystem" },
+  { id: "uptime", width: 90, setting: "showTableUptime" },
+  { id: "cpuUsage", width: 100, setting: "showTableCpu" },
+  { id: "memoryUsage", width: 100, setting: "showTableMemory" },
+  { id: "diskUsage", width: 100, setting: "showTableDisk" },
+  { id: "speed", width: 120, setting: "showTableSpeed" },
+  { id: "traffic", width: 110, setting: "showTableTraffic" },
+  { id: "ping", width: 160, setting: "showTablePing" },
 ] as const;
 
 const SYSTEM_ICON_MAPPINGS = [
@@ -92,6 +86,21 @@ function systemIconClass(system: string) {
   );
 }
 
+function NetworkCell({ down, up }: { down: string; up: string }) {
+  return (
+    <span className="grid gap-0.5 text-xs leading-4 tabular-nums">
+      <span className="flex min-w-0 items-center gap-1.5" title={`↓ ${down}`}>
+        <span className="shrink-0 text-status-online">↓</span>
+        <span className="truncate">{down}</span>
+      </span>
+      <span className="flex min-w-0 items-center gap-1.5" title={`↑ ${up}`}>
+        <span className="shrink-0 text-data-accent">↑</span>
+        <span className="truncate">{up}</span>
+      </span>
+    </span>
+  );
+}
+
 function UsageCell({ value }: { value: number | null }) {
   if (value === null) {
     return <span className="text-muted-foreground">—</span>;
@@ -122,10 +131,12 @@ export function NodeTable({
   rows,
   sortKey,
   showUptime,
+  settings,
 }: {
   rows: NodeRow[];
   sortKey: string;
   showUptime: boolean;
+  settings?: ThemeSettings;
 }) {
   useEffect(() => {
     const stylesheet = document.querySelector<HTMLLinkElement>(
@@ -147,7 +158,8 @@ export function NodeTable({
             <Link
               to="/instance/$uuid"
               params={{ uuid: info.row.original.uuid }}
-              className="inline-flex min-w-0 items-center gap-2 font-medium text-foreground hover:text-data-accent"
+              title={info.getValue()}
+              className="inline-flex max-w-full min-w-0 items-center gap-2 font-medium text-foreground hover:text-data-accent"
             >
               <span
                 className="flex size-5 shrink-0 items-center justify-center text-base"
@@ -214,20 +226,16 @@ export function NodeTable({
           );
         },
       }),
-      ...(showUptime
-        ? [
-            columnHelper.accessor("uptime", {
-              header: t("colUptime"),
-              cell: (info) => (
-                <LiveUptime
-                  uptime={info.getValue()}
-                  reportedAt={info.row.original.status?.time}
-                  className="text-xs text-foreground"
-                />
-              ),
-            }),
-          ]
-        : []),
+      columnHelper.accessor("uptime", {
+        header: t("colUptime"),
+        cell: (info) => (
+          <LiveUptime
+            uptime={info.getValue()}
+            reportedAt={info.row.original.status?.time}
+            className="text-xs text-foreground"
+          />
+        ),
+      }),
       columnHelper.accessor("cpuUsage", {
         header: t("cpu"),
         cell: (info) => <UsageCell value={info.getValue()} />,
@@ -244,42 +252,67 @@ export function NodeTable({
         id: "speed",
         header: t("colSpeed"),
         cell: (info) => (
-          <span className="grid w-full grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] items-center gap-2 whitespace-nowrap">
-            <span className="inline-flex min-w-0 items-center gap-1">
-              <span className="shrink-0 text-status-online">↓</span>
-              <span className="truncate">
-                {formatSpeed(info.row.original.netIn)}
-              </span>
-            </span>
-            <span className="text-border">/</span>
-            <span className="inline-flex min-w-0 items-center gap-1">
-              <span className="shrink-0 text-data-accent">↑</span>
-              <span className="truncate">
-                {formatSpeed(info.row.original.netOut)}
-              </span>
-            </span>
-          </span>
+          <NetworkCell
+            down={formatSpeed(info.row.original.netIn)}
+            up={formatSpeed(info.row.original.netOut)}
+          />
         ),
       }),
+      columnHelper.display({
+        id: "traffic",
+        header: t("colTraffic"),
+        cell: (info) => (
+          <NetworkCell
+            down={formatBytes(info.row.original.totalDown)}
+            up={formatBytes(info.row.original.totalUp)}
+          />
+        ),
+      }),
+      columnHelper.display({
+        id: "ping",
+        header: t("pingNetworks"),
+        cell: (info) => <NodePing uuid={info.row.original.uuid} compact />,
+      }),
     ],
-    [showUptime],
+    [],
+  );
+
+  const visibleColumns = TABLE_COLUMNS.filter(
+    (column) =>
+      (settings?.[column.setting] ?? true) &&
+      (column.id !== "uptime" || showUptime),
+  );
+  if (visibleColumns.length === 0) visibleColumns.push(TABLE_COLUMNS[0]);
+  const totalWidth = visibleColumns.reduce(
+    (sum, column) => sum + column.width,
+    0,
+  );
+  const columnVisibility = Object.fromEntries(
+    TABLE_COLUMNS.map((column) => [
+      column.id,
+      visibleColumns.some((visible) => visible.id === column.id),
+    ]),
   );
 
   const table = useLegacyTable({
     data: rows,
+    state: { columnVisibility },
     columns: columns as never,
     getCoreRowModel: getCoreRowModel(),
   });
 
   return (
     <div className="overflow-x-auto rounded-lg border border-border bg-card shadow-xs">
-      <table className="km-ui-table w-full min-w-220 table-fixed text-left text-sm">
+      <table
+        className="km-ui-table w-full table-fixed text-left text-sm"
+        style={{ minWidth: totalWidth }}
+      >
         <colgroup>
-          {(showUptime
-            ? TABLE_COLUMNS_WITH_UPTIME
-            : TABLE_COLUMNS_WITHOUT_UPTIME
-          ).map((column) => (
-            <col key={column.id} style={{ width: column.width }} />
+          {visibleColumns.map((column) => (
+            <col
+              key={column.id}
+              style={{ width: `${(column.width / totalWidth) * 100}%` }}
+            />
           ))}
         </colgroup>
         <thead className="bg-muted/50 text-xs text-muted-foreground">
@@ -296,7 +329,7 @@ export function NodeTable({
                   <th
                     key={header.id}
                     className={cn(
-                      "px-4 py-3 font-medium tracking-wide",
+                      "px-3 py-3 font-medium tracking-wide",
                       (header.column.id === "online" ||
                         header.column.id === "system") &&
                         "px-2 text-center",
@@ -323,7 +356,7 @@ export function NodeTable({
                 <td
                   key={cell.id}
                   className={cn(
-                    "km-metric overflow-hidden px-4 py-3.5 text-ellipsis whitespace-nowrap",
+                    "km-metric overflow-hidden px-3 py-2.5 text-ellipsis whitespace-nowrap",
                     (cell.column.id === "online" ||
                       cell.column.id === "system") &&
                       "px-1 text-center [text-overflow:clip]",

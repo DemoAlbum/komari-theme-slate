@@ -54,7 +54,7 @@ export function latencyDetailsForNode(
       p99: item.p99,
       loss: item.loss,
       lossApproximate: item.loss_approximate,
-      name: item.name || current?.name,
+      name: item.name,
     });
   }
 

@@ -94,6 +94,15 @@
         "name": { "zh-CN": "节点列表", "en": "Node list" }
       },
       {
+        "key": "showCardPing",
+        "name": {
+          "zh-CN": "卡片显示延迟与丢包",
+          "en": "Show card latency and loss"
+        },
+        "type": "switch",
+        "default": true
+      },
+      {
         "key": "showCardTags",
         "name": { "zh-CN": "显示节点标签", "en": "Show node tags" },
         "type": "switch",
@@ -148,6 +157,107 @@
           "zh-CN": "允许 1–60 秒，超出范围时回退为 1 秒",
           "en": "Accepts 1–60 seconds; invalid values fall back to 1 second"
         }
+      },
+      {
+        "type": "title",
+        "name": {
+          "zh-CN": "表格列",
+          "en": "Table columns"
+        },
+        "help": {
+          "zh-CN": "全部关闭时保留名称列；运行时间列还需开启“显示运行时间”",
+          "en": "If all columns are disabled, the name column remains visible. Uptime also requires Show uptime."
+        }
+      },
+      {
+        "key": "showTablePing",
+        "name": {
+          "zh-CN": "显示线路延迟与丢包列",
+          "en": "Show network latency and loss column"
+        },
+        "type": "switch",
+        "default": true
+      },
+      {
+        "key": "showTableName",
+        "name": {
+          "zh-CN": "显示名称列",
+          "en": "Show name column"
+        },
+        "type": "switch",
+        "default": true
+      },
+      {
+        "key": "showTableStatus",
+        "name": {
+          "zh-CN": "显示状态列",
+          "en": "Show status column"
+        },
+        "type": "switch",
+        "default": true
+      },
+      {
+        "key": "showTableSystem",
+        "name": {
+          "zh-CN": "显示系统列",
+          "en": "Show system column"
+        },
+        "type": "switch",
+        "default": true
+      },
+      {
+        "key": "showTableUptime",
+        "name": {
+          "zh-CN": "显示运行时间列",
+          "en": "Show uptime column"
+        },
+        "type": "switch",
+        "default": true
+      },
+      {
+        "key": "showTableCpu",
+        "name": {
+          "zh-CN": "显示CPU列",
+          "en": "Show cpu column"
+        },
+        "type": "switch",
+        "default": true
+      },
+      {
+        "key": "showTableMemory",
+        "name": {
+          "zh-CN": "显示内存列",
+          "en": "Show memory column"
+        },
+        "type": "switch",
+        "default": true
+      },
+      {
+        "key": "showTableDisk",
+        "name": {
+          "zh-CN": "显示磁盘列",
+          "en": "Show disk column"
+        },
+        "type": "switch",
+        "default": true
+      },
+      {
+        "key": "showTableSpeed",
+        "name": {
+          "zh-CN": "显示网速列",
+          "en": "Show speed column"
+        },
+        "type": "switch",
+        "default": true
+      },
+      {
+        "key": "showTableTraffic",
+        "name": {
+          "zh-CN": "显示总流量列",
+          "en": "Show total traffic column"
+        },
+        "type": "switch",
+        "default": true
       },
       {
         "type": "title",

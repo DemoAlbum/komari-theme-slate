@@ -98,6 +98,8 @@ These are for local development and packaging only. After the theme is deployed 
 | General | Default appearance, view, language, node sort, and sort direction |
 | Home page | Summary cards and map view |
 | Node list | Tags, billing, resource totals, network traffic, Swap, uptime, and its refresh interval |
+| Table columns | Individual visibility switches for name, status, system, uptime, CPU, memory, disk, speed, and total traffic (all enabled by default) |
+| Network quality | Independent table/card visibility; first three monitoring tasks and ten history segments from available samples over a one-hour window, refreshed every minute, with values on hover |
 | Guest display | Prices and expiration status |
 
 Visitor choices for appearance, language, view, and node sorting are stored locally (`appearance`, `language`, `slate:view`, `slate:sort`, `slate:sort-direction`) and take priority on later visits. Without a stored sort preference, nodes are displayed using the admin-managed default immediately. Guest prices and expiration status are hidden by default; signed-in users are unaffected by those two settings. Disabling the map automatically falls back from a stored map view to an available view.
