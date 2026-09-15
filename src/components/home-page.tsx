@@ -158,6 +158,12 @@ export function HomePage() {
       if (statusFilter === "all" && a.online !== b.online) {
         return a.online ? -1 : 1;
       }
+      if (sort === "default") {
+        return (
+          ((b.weight ?? 0) - (a.weight ?? 0) || a.name.localeCompare(b.name)) *
+          direction
+        );
+      }
       if (sort === "name") {
         return a.name.localeCompare(b.name) * direction;
       }
