@@ -3,6 +3,7 @@ import type { Client, NodeStatus } from "@/lib/schemas";
 export type NodeRow = {
   uuid: string;
   name: string;
+  weight: number;
   region: string;
   group: string;
   tags: string[];
@@ -73,6 +74,7 @@ export function buildNodeRows(
     return {
       uuid: client.uuid,
       name: client.name || client.uuid,
+      weight: client.weight ?? 0,
       region: client.region || "",
       group: client.group || "",
       tags: parseTags(client.tags),
