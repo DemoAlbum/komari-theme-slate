@@ -3,6 +3,7 @@ import { t } from "@/lib/i18n";
 import type { NodeSort, SortDirection } from "@/lib/schemas";
 
 function getSortLabel(value: NodeSort) {
+  if (value === "default") return t("sortDefault");
   if (value === "name") return t("sortName");
   if (value === "status") return t("sortStatus");
   if (value === "region") return t("colRegion");
@@ -38,6 +39,7 @@ export function SortControl({
         >
           {(
             [
+              "default",
               "name",
               "status",
               "region",
