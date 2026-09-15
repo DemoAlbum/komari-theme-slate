@@ -112,54 +112,66 @@ export function SiteHeader({
               <Search />
             </button>
           )}
-          <label
-            className={`relative ${iconButtonClass}`}
-            title={t("language")}
-          >
-            <span className="sr-only">{t("language")}</span>
-            <Languages />
-            <select
-              value={locale}
+          <DropdownMenu>
+            <DropdownMenuTrigger
+              className={iconButtonClass}
               aria-label={t("language")}
-              className="absolute inset-0 size-full cursor-pointer opacity-0"
-              onChange={(event) => {
-                const value = event.target.value;
-                if (value === "zh-CN" || value === "en") {
-                  setLocale(value);
-                }
-              }}
+              title={t("language")}
             >
-              <option value="zh-CN">{t("languageChinese")}</option>
-              <option value="en">{t("languageEnglish")}</option>
-            </select>
-          </label>
+              <Languages />
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="min-w-36">
+              <DropdownMenuRadioGroup
+                value={locale}
+                onValueChange={(value) => {
+                  if (value === "zh-CN" || value === "en") {
+                    setLocale(value);
+                  }
+                }}
+              >
+                <DropdownMenuRadioItem value="zh-CN" closeOnClick>
+                  {t("languageChinese")}
+                </DropdownMenuRadioItem>
+                <DropdownMenuRadioItem value="en" closeOnClick>
+                  {t("languageEnglish")}
+                </DropdownMenuRadioItem>
+              </DropdownMenuRadioGroup>
+            </DropdownMenuContent>
+          </DropdownMenu>
 
-          <label
-            className={`relative ${iconButtonClass}`}
-            title={t("appearance")}
-          >
-            <span className="sr-only">{t("appearance")}</span>
-            <Icon />
-            <select
-              value={theme}
+          <DropdownMenu>
+            <DropdownMenuTrigger
+              className={iconButtonClass}
               aria-label={t("appearance")}
-              className="absolute inset-0 size-full cursor-pointer opacity-0"
-              onChange={(event) => {
-                const value = event.target.value;
-                if (
-                  value === "system" ||
-                  value === "light" ||
-                  value === "dark"
-                ) {
-                  setTheme(value);
-                }
-              }}
+              title={t("appearance")}
             >
-              <option value="system">{t("appearanceSystem")}</option>
-              <option value="light">{t("appearanceLight")}</option>
-              <option value="dark">{t("appearanceDark")}</option>
-            </select>
-          </label>
+              <Icon />
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="min-w-36">
+              <DropdownMenuRadioGroup
+                value={theme}
+                onValueChange={(value) => {
+                  if (
+                    value === "system" ||
+                    value === "light" ||
+                    value === "dark"
+                  ) {
+                    setTheme(value);
+                  }
+                }}
+              >
+                <DropdownMenuRadioItem value="system" closeOnClick>
+                  {t("appearanceSystem")}
+                </DropdownMenuRadioItem>
+                <DropdownMenuRadioItem value="light" closeOnClick>
+                  {t("appearanceLight")}
+                </DropdownMenuRadioItem>
+                <DropdownMenuRadioItem value="dark" closeOnClick>
+                  {t("appearanceDark")}
+                </DropdownMenuRadioItem>
+              </DropdownMenuRadioGroup>
+            </DropdownMenuContent>
+          </DropdownMenu>
           {loggedIn ? (
             <button
               type="button"
