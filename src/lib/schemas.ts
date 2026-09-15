@@ -7,6 +7,7 @@ export const appearanceSchema = z.enum(["system", "light", "dark"]);
 export const homeViewSchema = z.enum(["table", "cards", "map"]);
 export const defaultLanguageSchema = z.enum(["auto", "zh-CN", "en"]);
 export const nodeSortSchema = z.enum([
+  "default",
   "name",
   "status",
   "region",
@@ -23,7 +24,7 @@ export const themeSettingsSchema = z
     defaultAppearance: appearanceSchema.optional().default("system"),
     defaultView: homeViewSchema.optional().default("table"),
     defaultLanguage: defaultLanguageSchema.optional().default("auto"),
-    defaultSort: nodeSortSchema.optional().default("name"),
+    defaultSort: nodeSortSchema.optional().default("default"),
     defaultSortDirection: sortDirectionSchema.optional().default("asc"),
     showTablePing: z.boolean().optional().default(true),
     showCardPing: z.boolean().optional().default(true),
