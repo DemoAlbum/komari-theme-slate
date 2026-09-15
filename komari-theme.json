@@ -51,8 +51,8 @@
         "key": "defaultSort",
         "name": { "zh-CN": "节点默认排序", "en": "Default node sort" },
         "type": "select",
-        "options": "name,status,region,uptime,cpu,memory,disk,speed",
-        "default": "name",
+        "options": "default,name,status,region,uptime,cpu,memory,disk,speed",
+        "default": "default",
         "help": {
           "zh-CN": "访客未设置本地排序字段时使用",
           "en": "Used when the visitor has no locally stored sort field"
