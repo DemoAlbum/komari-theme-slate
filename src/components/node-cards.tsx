@@ -268,7 +268,7 @@ export function NodeCards({
         const hiddenTagCount = tags.length - visibleTags.length;
         const allTagLabels = [
           ...ipTags,
-          ...tags,
+          ...tags.map((tag) => tag.label),
           ...(expiration ? [expiration.label] : []),
           ...(renewalPrice ? [renewalPrice.label] : []),
         ];
@@ -360,14 +360,14 @@ export function NodeCards({
                   ))}
                   {visibleTags.map((tag) => (
                     <Badge
-                      key={tag}
+                      key={tag.label}
                       variant="outline"
                       className={cn(
                         "h-5 max-w-28 px-1.5 text-[10px] font-normal",
-                        tagTone(tag),
+                        tagTone(tag.label, tag.color),
                       )}
                     >
-                      <span className="truncate">{tag}</span>
+                      <span className="truncate">{tag.label}</span>
                     </Badge>
                   ))}
                   {expiration ? (
