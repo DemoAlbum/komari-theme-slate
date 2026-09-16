@@ -1,7 +1,7 @@
 import { useServerVersion } from "@/hooks/use-komari";
 import { t } from "@/lib/i18n";
 
-const THEME_URL = "https://github.com/xkrfer/komari-theme-slate";
+const THEME_URL = "https://github.com/DemoAlbum/komari-theme-slate";
 const KOMARI_URL = "https://github.com/komari-monitor/komari";
 
 export function SiteFooter({ sitename }: { sitename: string }) {
