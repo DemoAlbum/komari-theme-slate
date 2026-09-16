@@ -14,12 +14,13 @@ import { t } from "@/lib/i18n";
 import type { NodeRow } from "@/lib/nodes";
 import { regionToFlagEmoji } from "@/lib/region";
 import type { ThemeSettings } from "@/lib/schemas";
+import { trafficPercent, trafficTone } from "@/lib/traffic";
 import { cn } from "@/lib/utils";
 
 const columnHelper = legacyCreateColumnHelper<NodeRow>();
 
 const TABLE_COLUMNS = [
-  { id: "name", width: 220, setting: "showTableName" },
+  { id: "name", width: 160, setting: "showTableName" },
   { id: "online", width: 60, setting: "showTableStatus" },
   { id: "system", width: 60, setting: "showTableSystem" },
   { id: "uptime", width: 90, setting: "showTableUptime" },
@@ -27,7 +28,7 @@ const TABLE_COLUMNS = [
   { id: "memoryUsage", width: 100, setting: "showTableMemory" },
   { id: "diskUsage", width: 100, setting: "showTableDisk" },
   { id: "speed", width: 120, setting: "showTableSpeed" },
-  { id: "traffic", width: 110, setting: "showTableTraffic" },
+  { id: "traffic", width: 160, setting: "showTableTraffic" },
   { id: "ping", width: 160, setting: "showTablePing" },
 ] as const;
 
@@ -123,6 +124,43 @@ function UsageCell({ value }: { value: number | null }) {
         aria-label={`${value.toFixed(2)}%`}
         className={cn("mt-1 gap-0", tone)}
       />
+    </div>
+  );
+}
+
+function TrafficCell({
+  down,
+  up,
+  used,
+  limit,
+  resetDay,
+}: {
+  down: string;
+  up: string;
+  used: number;
+  limit: number;
+  resetDay: number | null;
+}) {
+  const percent = trafficPercent(used, limit);
+  const resetTitle = resetDay
+    ? t("trafficResetsOnDay").replace("{day}", String(resetDay))
+    : undefined;
+
+  return (
+    <div className="grid gap-1" title={resetTitle}>
+      <NetworkCell down={down} up={up} />
+      {percent === null ? null : (
+        <div className="w-full min-w-16 max-w-24">
+          <Progress
+            value={percent}
+            aria-label={`${t("colTraffic")} ${percent.toFixed(0)}%`}
+            className={cn("gap-0", trafficTone(percent))}
+          />
+          <span className="mt-0.5 block text-[10px] text-muted-foreground">
+            {percent.toFixed(0)}%
+          </span>
+        </div>
+      )}
     </div>
   );
 }
@@ -262,9 +300,12 @@ export function NodeTable({
         id: "traffic",
         header: t("colTraffic"),
         cell: (info) => (
-          <NetworkCell
+          <TrafficCell
             down={formatBytes(info.row.original.totalDown)}
             up={formatBytes(info.row.original.totalUp)}
+            used={info.row.original.traffic}
+            limit={info.row.original.trafficLimit}
+            resetDay={info.row.original.trafficResetDay}
           />
         ),
       }),
