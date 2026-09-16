@@ -1,10 +1,10 @@
 {
-  "name": "Slate",
-  "short": "Slate",
+  "name": "Slate-DA",
+  "short": "Slate-DA",
   "description": "A restrained Komari theme with a table-first home",
   "version": "0.1.0",
-  "author": "DouDou",
-  "url": "https://github.com/xkrfer/komari-theme-slate",
+  "author": "DemoAlbum",
+  "url": "https://github.com/DemoAlbum/komari-theme-slate",
   "preview": "preview.png",
   "configuration": {
     "type": "managed",
@@ -63,7 +63,7 @@
         "name": { "zh-CN": "默认排序方向", "en": "Default sort direction" },
         "type": "select",
         "options": "asc,desc",
-        "default": "asc",
+        "default": "desc",
         "help": {
           "zh-CN": "访客未设置本地排序方向时使用",
           "en": "Used when the visitor has no locally stored sort direction"
