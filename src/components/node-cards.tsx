@@ -20,6 +20,7 @@ import { t } from "@/lib/i18n";
 import type { NodeRow } from "@/lib/nodes";
 import { regionToFlagEmoji } from "@/lib/region";
 import { tagTone } from "@/lib/tag";
+import { trafficPercent, trafficTone } from "@/lib/traffic";
 import { cn } from "@/lib/utils";
 
 function expirationBadge(
@@ -174,6 +175,47 @@ function NetworkMetric({
           <span className="truncate">{up}</span>
         </span>
       </span>
+    </div>
+  );
+}
+
+function TrafficBar({
+  used,
+  limit,
+  resetDay,
+}: {
+  used: number;
+  limit: number;
+  resetDay: number | null;
+}) {
+  const percent = trafficPercent(used, limit);
+
+  return (
+    <div className="mt-2 min-w-0">
+      <div className="flex items-center justify-between gap-2 text-[11px] text-muted-foreground">
+        <span className="truncate">
+          {percent === null
+            ? t("trafficUnlimited")
+            : `${formatBytes(used)} / ${formatBytes(limit)}`}
+        </span>
+        {percent === null ? null : (
+          <span className="km-metric shrink-0 font-semibold text-foreground">
+            {percent.toFixed(0)}%
+          </span>
+        )}
+      </div>
+      {percent === null ? null : (
+        <Progress
+          value={percent}
+          aria-label={`${t("colTraffic")} ${percent.toFixed(0)}%`}
+          className={cn("mt-1 gap-0", trafficTone(percent))}
+        />
+      )}
+      {resetDay ? (
+        <p className="mt-1 text-[10px] text-muted-foreground">
+          {t("trafficResetsOnDay").replace("{day}", String(resetDay))}
+        </p>
+      ) : null}
     </div>
   );
 }
@@ -428,6 +470,11 @@ export function NodeCards({
                         label={t("colTraffic")}
                         down={formatBytes(row.totalDown)}
                         up={formatBytes(row.totalUp)}
+                      />
+                      <TrafficBar
+                        used={row.traffic}
+                        limit={row.trafficLimit}
+                        resetDay={row.trafficResetDay}
                       />
                     </div>
                   </>
