@@ -110,6 +110,10 @@ export const clientSchema = z
     swap_total: numberish,
     disk_total: numberish,
     traffic_limit: numberish,
+    traffic_limit_type: z
+      .enum(["max", "min", "sum", "up", "down"])
+      .optional()
+      .default("sum"),
     weight: numberish,
   })
   .passthrough();
