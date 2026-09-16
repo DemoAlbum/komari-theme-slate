@@ -261,16 +261,11 @@ export function NodeCards({
               row.client.billing_cycle,
             )
           : null;
-        const reservedTags =
-          ipTags.length + (expiration ? 1 : 0) + (renewalPrice ? 1 : 0);
-        const visibleTagLimit = Math.max(0, 4 - reservedTags);
-        const visibleTags = tags.slice(0, visibleTagLimit);
-        const hiddenTagCount = tags.length - visibleTags.length;
         const allTagLabels = [
           ...ipTags,
-          ...tags.map((tag) => tag.label),
           ...(expiration ? [expiration.label] : []),
           ...(renewalPrice ? [renewalPrice.label] : []),
+          ...tags.map((tag) => tag.label),
         ];
         return (
           <Link
@@ -337,7 +332,7 @@ export function NodeCards({
                   </span>
                 </CardTitle>
                 <div
-                  className="mt-1 flex h-5 min-w-0 flex-nowrap items-center gap-1.5 overflow-hidden"
+                  className="mt-1 flex min-w-0 flex-wrap items-center gap-1.5"
                   title={
                     allTagLabels.length > 0
                       ? allTagLabels.join(", ")
@@ -356,18 +351,6 @@ export function NodeCards({
                       )}
                     >
                       {tag}
-                    </Badge>
-                  ))}
-                  {visibleTags.map((tag) => (
-                    <Badge
-                      key={tag.label}
-                      variant="outline"
-                      className={cn(
-                        "h-5 max-w-28 px-1.5 text-[10px] font-normal",
-                        tagTone(tag.label, tag.color),
-                      )}
-                    >
-                      <span className="truncate">{tag.label}</span>
                     </Badge>
                   ))}
                   {expiration ? (
@@ -392,14 +375,18 @@ export function NodeCards({
                       <span className="truncate">{renewalPrice.label}</span>
                     </Badge>
                   ) : null}
-                  {hiddenTagCount > 0 ? (
+                  {tags.map((tag) => (
                     <Badge
-                      variant="secondary"
-                      className="h-5 px-1.5 text-[10px] font-normal text-muted-foreground"
+                      key={tag.label}
+                      variant="outline"
+                      className={cn(
+                        "h-5 max-w-28 px-1.5 text-[10px] font-normal",
+                        tagTone(tag.label, tag.color),
+                      )}
                     >
-                      +{hiddenTagCount}
+                      <span className="truncate">{tag.label}</span>
                     </Badge>
-                  ) : null}
+                  ))}
                 </div>
               </CardHeader>
 
