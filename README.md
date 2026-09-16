@@ -2,7 +2,7 @@
 
 Slate is a restrained [Komari](https://github.com/komari-monitor/komari) theme. The home page shows nodes in a table by default. It is built with **Vite**, **React**, **TypeScript**, **Tailwind CSS**, and **shadcn/ui**, then packaged as static assets you can upload as a Komari theme.
 
-[中文](README-CN.md) · [Download theme](https://github.com/xkrfer/komari-theme-slate/releases/latest)
+[中文](README-CN.md) · [Download theme](https://github.com/DemoAlbum/komari-theme-slate/releases/latest)
 
 > This repository contains the frontend only. You need a running Komari backend. The recommended setup is to download the ZIP from Releases and upload it in the Komari admin dashboard.
 
@@ -45,7 +45,7 @@ In production, node status is refreshed about every 2 seconds over a WebSocket t
 
 ## Install
 
-1. Download `komari-theme-slate-v*.zip` from [Releases](https://github.com/xkrfer/komari-theme-slate/releases/latest), or run `pnpm package` locally.
+1. Download `komari-theme-slate-v*.zip` from [Releases](https://github.com/DemoAlbum/komari-theme-slate/releases/latest), or run `pnpm package` locally.
 2. Upload the ZIP in the Komari admin dashboard and enable **Slate**.
 3. Optionally adjust the default appearance and visitor default view in theme settings.
 
@@ -156,4 +156,4 @@ The backend is [Komari](https://github.com/komari-monitor/komari).
 
 ## License
 
-[MIT](LICENSE) © DouDou
+[MIT](LICENSE) © DemoAlbum
