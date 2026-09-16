@@ -1,12 +1,17 @@
 import type { Client, NodeStatus } from "@/lib/schemas";
 
+export type NodeTag = {
+  label: string;
+  color: string | null;
+};
+
 export type NodeRow = {
   uuid: string;
   name: string;
   weight: number;
   region: string;
   group: string;
-  tags: string[];
+  tags: NodeTag[];
   ipTags: string[];
   online: boolean;
   traffic: number;
@@ -36,18 +41,23 @@ function usagePercent(used: number, total: number) {
   return clampPercent((used / total) * 100);
 }
 
-function parseTags(tags: string) {
-  return [
-    ...new Set(
-      tags
-        .split(";")
-        .map((tag) => tag.trim())
-        .filter(Boolean)
-        .filter((tag) => !TRAFFIC_RESET_TAG_PATTERN.test(tag)),
-    ),
-  ];
+function parseTags(tags: string): NodeTag[] {
+  const seen = new Set<string>();
+  const result: NodeTag[] = [];
+  for (const raw of tags.split(";")) {
+    const trimmed = raw.trim();
+    if (!trimmed || TRAFFIC_RESET_TAG_PATTERN.test(trimmed)) continue;
+    const match = trimmed.match(TAG_COLOR_PATTERN);
+    const label = (match ? match[1] : trimmed).trim();
+    const color = match ? match[2].toLowerCase() : null;
+    if (!label || seen.has(label)) continue;
+    seen.add(label);
+    result.push({ label, color });
+  }
+  return result;
 }
 
+const TAG_COLOR_PATTERN = /^(.*)<([a-z]+)>$/i;
 const TRAFFIC_RESET_TAG_PATTERN = /^<trd:(\d{1,2})>$/i;
 
 function trafficResetDay(tags: string): number | null {
