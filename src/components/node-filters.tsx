@@ -1,3 +1,11 @@
+import { ChevronDown } from "lucide-react";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuRadioGroup,
+  DropdownMenuRadioItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { t } from "@/lib/i18n";
 
 export function NodeFilters({
@@ -13,26 +21,35 @@ export function NodeFilters({
     return null;
   }
 
+  const value = group ?? "all";
+
   return (
-    <label className="relative">
-      <span className="sr-only">{t("filterGroup")}</span>
-      <select
+    <DropdownMenu>
+      <DropdownMenuTrigger
         id="group-filter"
-        value={group ?? "all"}
-        onChange={(event) =>
-          onGroupChange(
-            event.target.value === "all" ? null : event.target.value,
-          )
-        }
-        className="h-9 min-w-28 appearance-none rounded-lg border border-input bg-card px-2.5 py-2 text-xs font-medium shadow-xs outline-none transition-colors focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50"
+        aria-label={t("filterGroup")}
+        className="flex h-9 min-w-28 items-center justify-between gap-2 rounded-lg border border-input bg-card px-2.5 py-2 text-xs font-medium shadow-xs outline-none transition-colors hover:bg-muted focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50"
       >
-        <option value="all">{t("allGroups")}</option>
-        {groups.map((item) => (
-          <option key={item} value={item}>
-            {item}
-          </option>
-        ))}
-      </select>
-    </label>
+        <span className="truncate">
+          {value === "all" ? t("allGroups") : value}
+        </span>
+        <ChevronDown className="size-3.5 shrink-0 text-muted-foreground" />
+      </DropdownMenuTrigger>
+      <DropdownMenuContent align="start">
+        <DropdownMenuRadioGroup
+          value={value}
+          onValueChange={(next) => onGroupChange(next === "all" ? null : next)}
+        >
+          <DropdownMenuRadioItem value="all" closeOnClick>
+            {t("allGroups")}
+          </DropdownMenuRadioItem>
+          {groups.map((item) => (
+            <DropdownMenuRadioItem key={item} value={item} closeOnClick>
+              {item}
+            </DropdownMenuRadioItem>
+          ))}
+        </DropdownMenuRadioGroup>
+      </DropdownMenuContent>
+    </DropdownMenu>
   );
 }
