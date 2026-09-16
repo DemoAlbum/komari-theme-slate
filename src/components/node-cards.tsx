@@ -201,7 +201,7 @@ export function NodeCards({
   const now = Date.now();
 
   return (
-    <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+    <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
       {rows.map((row, index) => {
         const flag = regionToFlagEmoji(row.region);
         const memoryTotal = row.status?.ram_total || row.client.mem_total;
