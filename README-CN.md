@@ -2,7 +2,7 @@
 
 Slate 是一套简洁克制的 [Komari](https://github.com/komari-monitor/komari) 主题，首页默认用表格展示节点。基于 **Vite**、**React**、**TypeScript**、**Tailwind CSS** 和 **shadcn/ui** 构建，打包为静态资源后可作为 Komari 主题上传使用。
 
-[English](README.md) · [下载主题](https://github.com/xkrfer/komari-theme-slate/releases/latest)
+[English](README.md) · [下载主题](https://github.com/DemoAlbum/komari-theme-slate/releases/latest)
 
 > 本仓库只包含前端。界面需要一个正在运行的 Komari 后端。推荐从 Release 下载 ZIP，在 Komari 管理后台上传并启用。
 
@@ -45,7 +45,7 @@ Slate 是一套简洁克制的 [Komari](https://github.com/komari-monitor/komari
 
 ## 安装
 
-1. 从 [Releases](https://github.com/xkrfer/komari-theme-slate/releases/latest) 下载 `komari-theme-slate-v*.zip`，或本地执行 `pnpm package`。
+1. 从 [Releases](https://github.com/DemoAlbum/komari-theme-slate/releases/latest) 下载 `komari-theme-slate-v*.zip`，或本地执行 `pnpm package`。
 2. 在 Komari 后台上传 ZIP 并启用 **Slate**。
 3. 按需在主题设置中调整默认外观和访客默认视图。
 
@@ -156,4 +156,4 @@ pnpm format
 
 ## License
 
-[MIT](LICENSE) © DouDou
+[MIT](LICENSE) © DemoAlbum
