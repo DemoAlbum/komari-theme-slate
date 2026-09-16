@@ -28,7 +28,7 @@ const TABLE_COLUMNS = [
   { id: "memoryUsage", width: 100, setting: "showTableMemory" },
   { id: "diskUsage", width: 100, setting: "showTableDisk" },
   { id: "speed", width: 120, setting: "showTableSpeed" },
-  { id: "traffic", width: 160, setting: "showTableTraffic" },
+  { id: "traffic", width: 130, setting: "showTableTraffic" },
   { id: "ping", width: 160, setting: "showTablePing" },
 ] as const;
 
