@@ -1,6 +1,25 @@
-import { ArrowDown, ArrowUp } from "lucide-react";
+import { ArrowDown, ArrowUp, ChevronDown } from "lucide-react";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuRadioGroup,
+  DropdownMenuRadioItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { t } from "@/lib/i18n";
 import type { NodeSort, SortDirection } from "@/lib/schemas";
+
+const SORT_VALUES: NodeSort[] = [
+  "default",
+  "name",
+  "status",
+  "region",
+  "uptime",
+  "cpu",
+  "memory",
+  "disk",
+  "speed",
+];
 
 function getSortLabel(value: NodeSort) {
   if (value === "default") return t("sortDefault");
@@ -29,33 +48,32 @@ export function SortControl({
 
   return (
     <div className="flex items-center gap-1.5">
-      <label className="relative">
-        <span className="sr-only">{t("sort")}</span>
-        <select
+      <DropdownMenu>
+        <DropdownMenuTrigger
           id="node-sort"
-          value={value}
-          onChange={(event) => onChange(event.target.value as NodeSort)}
-          className="h-9 min-w-28 appearance-none rounded-lg border border-input bg-card px-2.5 py-2 text-xs font-medium shadow-xs outline-none transition-colors focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50"
+          aria-label={t("sort")}
+          className="flex h-9 min-w-28 items-center justify-between gap-2 rounded-lg border border-input bg-card px-2.5 py-2 text-xs font-medium shadow-xs outline-none transition-colors hover:bg-muted focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50"
         >
-          {(
-            [
-              "default",
-              "name",
-              "status",
-              "region",
-              "uptime",
-              "cpu",
-              "memory",
-              "disk",
-              "speed",
-            ] as NodeSort[]
-          ).map((sortValue) => (
-            <option key={sortValue} value={sortValue}>
-              {getSortLabel(sortValue)}
-            </option>
-          ))}
-        </select>
-      </label>
+          <span className="truncate">{getSortLabel(value)}</span>
+          <ChevronDown className="size-3.5 shrink-0 text-muted-foreground" />
+        </DropdownMenuTrigger>
+        <DropdownMenuContent align="start">
+          <DropdownMenuRadioGroup
+            value={value}
+            onValueChange={(next) => onChange(next as NodeSort)}
+          >
+            {SORT_VALUES.map((sortValue) => (
+              <DropdownMenuRadioItem
+                key={sortValue}
+                value={sortValue}
+                closeOnClick
+              >
+                {getSortLabel(sortValue)}
+              </DropdownMenuRadioItem>
+            ))}
+          </DropdownMenuRadioGroup>
+        </DropdownMenuContent>
+      </DropdownMenu>
       <button
         type="button"
         className="inline-flex size-9 items-center justify-center rounded-lg border border-border bg-card text-sm shadow-xs outline-none transition-colors hover:bg-muted focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50"
