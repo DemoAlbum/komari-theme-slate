@@ -11,6 +11,7 @@ export type NodeRow = {
   online: boolean;
   traffic: number;
   trafficLimit: number;
+  trafficResetDay: number | null;
   totalUp: number;
   totalDown: number;
   netIn: number;
@@ -41,9 +42,33 @@ function parseTags(tags: string) {
       tags
         .split(";")
         .map((tag) => tag.trim())
-        .filter(Boolean),
+        .filter(Boolean)
+        .filter((tag) => !TRAFFIC_RESET_TAG_PATTERN.test(tag)),
     ),
   ];
+}
+
+const TRAFFIC_RESET_TAG_PATTERN = /^<trd:(\d{1,2})>$/i;
+
+function trafficResetDay(tags: string): number | null {
+  for (const raw of tags.split(";")) {
+    const match = raw.trim().match(TRAFFIC_RESET_TAG_PATTERN);
+    if (match) {
+      const day = Number(match[1]);
+      if (Number.isFinite(day) && day >= 1 && day <= 31) {
+        return day;
+      }
+    }
+  }
+  return null;
+}
+
+function trafficUsage(type: string, up: number, down: number) {
+  if (type === "up") return up;
+  if (type === "down") return down;
+  if (type === "max") return Math.max(up, down);
+  if (type === "min") return Math.min(up, down);
+  return up + down;
 }
 
 function reportedUptime(online: boolean, uptime: number | undefined) {
@@ -80,8 +105,13 @@ export function buildNodeRows(
       tags: parseTags(client.tags),
       ipTags: ipTypeTags(client.ipv4, client.ipv6),
       online,
-      traffic: (status?.net_total_up ?? 0) + (status?.net_total_down ?? 0),
+      traffic: trafficUsage(
+        client.traffic_limit_type,
+        status?.net_total_up ?? 0,
+        status?.net_total_down ?? 0,
+      ),
       trafficLimit: client.traffic_limit ?? 0,
+      trafficResetDay: trafficResetDay(client.tags),
       totalUp: status?.net_total_up ?? 0,
       totalDown: status?.net_total_down ?? 0,
       netIn: status?.net_in ?? 0,
