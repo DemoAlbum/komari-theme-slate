@@ -179,7 +179,7 @@ export function SiteHeader({
               aria-label={t("admin")}
               title={t("admin")}
               onClick={() => {
-                window.location.assign("/yYAmg3pzQzfY");
+                window.location.assign("/admin");
               }}
             >
               <CircleUserRound />
