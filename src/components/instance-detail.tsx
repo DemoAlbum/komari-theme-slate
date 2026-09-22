@@ -474,11 +474,31 @@ type PingService = {
   loss: number;
   fluctuation: number;
   values: Array<[number, number]>;
+  /** [bucketStartTime, lossPercentInBucket] — auto-bucketed loss over time. */
+  lossSeries: Array<[number, number]>;
 };
+
+/** Candidate bucket widths (ms) for auto-sizing the packet-loss series. */
+const LOSS_BUCKET_STEPS_MS = [
+  10_000, 30_000, 60_000, 120_000, 300_000, 600_000, 900_000, 1_800_000,
+  3_600_000, 7_200_000, 10_800_000, 21_600_000, 43_200_000, 86_400_000,
+];
+
+/** Picks a bucket width so the visible range renders roughly `targetBuckets` bars. */
+function pickLossBucketMs(spanMs: number, targetBuckets = 60) {
+  if (spanMs <= 0) return LOSS_BUCKET_STEPS_MS[0];
+  const ideal = spanMs / targetBuckets;
+  return (
+    LOSS_BUCKET_STEPS_MS.find((step) => step >= ideal) ??
+    LOSS_BUCKET_STEPS_MS[LOSS_BUCKET_STEPS_MS.length - 1]
+  );
+}
 
 function buildPingServices(records: PingRecord[], tasks: PingTask[]) {
   const taskById = new Map(tasks.map((task) => [String(task.id), task]));
   const grouped = new Map<string, PingRecord[]>();
+  let minTime = Number.POSITIVE_INFINITY;
+  let maxTime = Number.NEGATIVE_INFINITY;
 
   for (const record of records) {
     if (record.task_id === undefined) continue;
@@ -486,7 +506,14 @@ function buildPingServices(records: PingRecord[], tasks: PingTask[]) {
     const group = grouped.get(taskId);
     if (group) group.push(record);
     else grouped.set(taskId, [record]);
+    const time = Date.parse(record.time);
+    if (Number.isFinite(time)) {
+      if (time < minTime) minTime = time;
+      if (time > maxTime) maxTime = time;
+    }
   }
+
+  const bucketMs = pickLossBucketMs(maxTime - minTime);
 
   return [...grouped.entries()].map(([taskId, taskRecords], index) => {
     const valid = taskRecords.filter(
@@ -500,6 +527,26 @@ function buildPingServices(records: PingRecord[], tasks: PingTask[]) {
         ? latency.reduce((total, value) => total + (value - average) ** 2, 0) /
           latency.length
         : 0;
+
+    const buckets = new Map<number, { total: number; lost: number }>();
+    for (const record of taskRecords) {
+      const time = Date.parse(record.time);
+      if (!Number.isFinite(time)) continue;
+      const bucketStart = Math.floor(time / bucketMs) * bucketMs;
+      const bucket = buckets.get(bucketStart) ?? { total: 0, lost: 0 };
+      bucket.total += 1;
+      if (!(Number.isFinite(record.value) && record.value > 0)) {
+        bucket.lost += 1;
+      }
+      buckets.set(bucketStart, bucket);
+    }
+    const lossSeries: Array<[number, number]> = [...buckets.entries()]
+      .sort(([a], [b]) => a - b)
+      .map(([time, { total, lost }]) => [
+        time,
+        total > 0 ? (lost / total) * 100 : 0,
+      ]);
+
     return {
       taskId,
       name: taskById.get(taskId)?.name || `Ping ${taskId}`,
@@ -516,6 +563,7 @@ function buildPingServices(records: PingRecord[], tasks: PingTask[]) {
           : Date.now() + recordIndex * 1_000,
         record.value,
       ]),
+      lossSeries,
     } satisfies PingService;
   });
 }
@@ -550,7 +598,7 @@ function PingChart({
     chart.setOption({
       animationDuration: 360,
       animationDurationUpdate: 280,
-      grid: { left: 8, right: 12, top: 18, bottom: 48, containLabel: true },
+      grid: { left: 8, right: 40, top: 18, bottom: 48, containLabel: true },
       tooltip: {
         trigger: "axis",
         confine: true,
@@ -558,7 +606,32 @@ function PingChart({
         borderColor: border,
         backgroundColor: card,
         textStyle: { color: foreground, fontSize: 12 },
-        valueFormatter: (value: unknown) => formatMilliseconds(Number(value)),
+        formatter: (params: unknown) => {
+          const list = Array.isArray(params) ? params : [params];
+          const time = (
+            list[0] as { axisValueLabel?: string; value?: [number, number] }
+          )?.axisValueLabel;
+          const rows = list
+            .map((item) => {
+              const { seriesName, value, color, seriesType } = item as {
+                seriesName: string;
+                value: [number, number];
+                color: string;
+                seriesType: string;
+              };
+              const formatted =
+                seriesType === "bar"
+                  ? formatPercentAxis(value[1])
+                  : formatMilliseconds(value[1]);
+              return `<div style="display:flex;align-items:center;gap:6px;">
+                <span style="display:inline-block;width:8px;height:8px;border-radius:2px;background:${color};"></span>
+                <span style="flex:1;min-width:0;">${seriesName}</span>
+                <span style="font-weight:600;">${formatted}</span>
+              </div>`;
+            })
+            .join("");
+          return `<div style="margin-bottom:4px;">${time ?? ""}</div>${rows}`;
+        },
       },
       xAxis: {
         type: "time",
@@ -568,19 +641,36 @@ function PingChart({
         splitLine: { show: false },
         axisLabel: { color: muted, fontSize: 11, hideOverlap: true },
       },
-      yAxis: {
-        type: "value",
-        min: 0,
-        splitNumber: 4,
-        axisLine: { show: false },
-        axisTick: { show: false },
-        axisLabel: {
-          color: muted,
-          fontSize: 11,
-          formatter: formatMilliseconds,
+      yAxis: [
+        {
+          type: "value",
+          min: 0,
+          splitNumber: 4,
+          axisLine: { show: false },
+          axisTick: { show: false },
+          axisLabel: {
+            color: muted,
+            fontSize: 11,
+            formatter: formatMilliseconds,
+          },
+          splitLine: { lineStyle: { color: border, opacity: 0.72 } },
         },
-        splitLine: { lineStyle: { color: border, opacity: 0.72 } },
-      },
+        {
+          type: "value",
+          min: 0,
+          max: 100,
+          splitNumber: 4,
+          position: "right",
+          axisLine: { show: false },
+          axisTick: { show: false },
+          axisLabel: {
+            color: muted,
+            fontSize: 11,
+            formatter: formatPercentAxis,
+          },
+          splitLine: { show: false },
+        },
+      ],
     });
     const observer = new ResizeObserver(() => chart.resize());
     observer.observe(host);
@@ -604,18 +694,31 @@ function PingChart({
           textStyle: { fontSize: 11 },
           data: displayedServices.map((service) => service.name),
         },
-        series: displayedServices.map((service) => ({
-          id: service.taskId,
-          name: service.name,
-          type: "line",
-          data: service.values,
-          showSymbol: false,
-          symbol: "none",
-          smooth: false,
-          lineStyle: { color: service.color, width: 1.35 },
-          itemStyle: { color: service.color },
-          emphasis: { disabled: true },
-        })),
+        series: displayedServices.flatMap((service) => [
+          {
+            id: `${service.taskId}-latency`,
+            name: service.name,
+            type: "line",
+            yAxisIndex: 0,
+            data: service.values,
+            showSymbol: false,
+            symbol: "none",
+            smooth: false,
+            lineStyle: { color: service.color, width: 1.35 },
+            itemStyle: { color: service.color },
+            emphasis: { disabled: true },
+          },
+          {
+            id: `${service.taskId}-loss`,
+            name: service.name,
+            type: "bar",
+            yAxisIndex: 1,
+            data: service.lossSeries,
+            barMaxWidth: 6,
+            itemStyle: { color: service.color, opacity: 0.55 },
+            emphasis: { disabled: true },
+          },
+        ]),
       },
       { lazyUpdate: true, replaceMerge: ["series"] },
     );
