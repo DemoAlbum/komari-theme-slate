@@ -20,6 +20,7 @@ import { useNodeStatus, usePingTasks } from "@/hooks/use-komari";
 import { getLoadRecords, getPingRecords, getRecentNodeStatus } from "@/lib/api";
 import { formatBytes, formatSpeed } from "@/lib/format";
 import { t } from "@/lib/i18n";
+import { systemIconSrc } from "@/lib/os-icon";
 import { isRegionFlagEmoji, regionToFlagIconSrc } from "@/lib/region";
 import type {
   Client,
@@ -987,7 +988,7 @@ export function InstanceDetail({ client }: { client: Client }) {
                         alt=""
                         loading="lazy"
                         decoding="async"
-                        className="h-3.5 w-5 rounded-[2px] object-cover shadow-[0_0_0_1px_rgb(0_0_0_/_8%)]"
+                        className="h-3.5 w-5 rounded-[2px]"
                         onError={(event) => {
                           event.currentTarget.style.display = "none";
                         }}
@@ -1047,7 +1048,19 @@ export function InstanceDetail({ client }: { client: Client }) {
                   valueClassName="break-words"
                 >
                   {hasText(client.os) ? (
-                    <span className="block">{client.os}</span>
+                    <span className="flex items-center gap-1.5">
+                      <img
+                        src={systemIconSrc(client.os)}
+                        alt=""
+                        loading="lazy"
+                        decoding="async"
+                        className="h-4 w-4 shrink-0"
+                        onError={(event) => {
+                          event.currentTarget.src = "/assets/os-icons/tux.svg";
+                        }}
+                      />
+                      {client.os}
+                    </span>
                   ) : null}
                   {hasText(client.kernel_version) ? (
                     <span className="mt-0.5 block text-xs leading-4 font-normal text-muted-foreground">
