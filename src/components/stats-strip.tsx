@@ -1,10 +1,11 @@
 import {
-  ArrowDown,
-  ArrowUp,
-  CircleArrowDown,
-  CircleArrowUp,
   Radio,
   Server,
+  ArrowUpDown,
+  ArrowUpNarrowWide,
+  ArrowDownWideNarrow,
+  CircleChevronUp,
+  CircleChevronDown,
 } from "lucide-react";
 import { formatBytes, formatSpeed } from "@/lib/format";
 import { t } from "@/lib/i18n";
@@ -125,28 +126,28 @@ export function StatsStrip({
           <div className="space-y-1 pt-0.5">
             <div className="flex min-w-0 items-center gap-2 text-sm leading-5 font-semibold tracking-normal">
               <span className="inline-flex min-w-0 items-center text-data-accent">
-                <ArrowUp className="size-3.5 shrink-0" />
+                <ArrowUpNarrowWide className="size-3.5 shrink-0" />
                 <span className="truncate">{formatBytes(totalUp)}</span>
               </span>
               <span className="inline-flex min-w-0 items-center text-violet-600 dark:text-violet-400">
-                <ArrowDown className="size-3.5 shrink-0" />
+                <ArrowDownWideNarrow className="size-3.5 shrink-0" />
                 <span className="truncate">{formatBytes(totalDown)}</span>
               </span>
             </div>
             <div className="flex min-w-0 items-center gap-2 text-[11px] leading-4 font-medium tracking-normal text-foreground">
               <span className="inline-flex min-w-0 items-center gap-1">
-                <CircleArrowUp className="size-3.5 shrink-0 fill-foreground text-background" />
+                <CircleChevronUp className="size-3.5 shrink-0 fill-foreground text-background" />
                 <span className="truncate">{formatSpeed(netOut)}</span>
               </span>
               <span className="inline-flex min-w-0 items-center gap-1">
-                <CircleArrowDown className="size-3.5 shrink-0 fill-foreground text-background" />
+                <CircleChevronDown className="size-3.5 shrink-0 fill-foreground text-background" />
                 <span className="truncate">{formatSpeed(netIn)}</span>
               </span>
             </div>
           </div>
         }
         tone="neutral"
-        icon={<ArrowUp className="size-4" />}
+        icon={<ArrowUpDown className="size-4" />}
       />
     </div>
   );
