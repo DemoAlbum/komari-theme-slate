@@ -20,7 +20,7 @@ import { useNodeStatus, usePingTasks } from "@/hooks/use-komari";
 import { getLoadRecords, getPingRecords, getRecentNodeStatus } from "@/lib/api";
 import { formatBytes, formatSpeed } from "@/lib/format";
 import { t } from "@/lib/i18n";
-import { regionToFlagEmoji } from "@/lib/region";
+import { isRegionFlagEmoji, regionToFlagIconSrc } from "@/lib/region";
 import type {
   Client,
   LoadRecord,
@@ -748,8 +748,10 @@ export function InstanceDetail({ client }: { client: Client }) {
     refetchInterval: range === "live" ? 2_000 : false,
   });
   const records = historyQuery.data ?? [];
-  const flag = regionToFlagEmoji(client.region);
-  const regionLabel = client.region.trim() === flag ? "" : client.region.trim();
+  const flag = regionToFlagIconSrc(client.region);
+  const regionLabel = isRegionFlagEmoji(client.region)
+    ? ""
+    : client.region.trim();
   const memoryTotal = status?.ram_total || client.mem_total;
   const diskTotal = status?.disk_total || client.disk_total;
   const reportTime = status?.time || records.at(-1)?.time;
@@ -876,9 +878,16 @@ export function InstanceDetail({ client }: { client: Client }) {
                   <span className="inline-flex items-center gap-1.5">
                     {regionLabel}
                     {flag ? (
-                      <span className="text-base" aria-hidden="true">
-                        {flag}
-                      </span>
+                      <img
+                        src={flag}
+                        alt=""
+                        loading="lazy"
+                        decoding="async"
+                        className="h-3.5 w-5 rounded-[2px] object-cover shadow-[0_0_0_1px_rgb(0_0_0_/_8%)]"
+                        onError={(event) => {
+                          event.currentTarget.style.display = "none";
+                        }}
+                      />
                     ) : (
                       <MapPin className="size-3.5 text-muted-foreground" />
                     )}
