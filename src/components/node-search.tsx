@@ -135,7 +135,7 @@ export function NodeSearch({
                           aria-hidden="true"
                           loading="lazy"
                           decoding="async"
-                          className="h-4 w-5.5 rounded-[2px] object-cover shadow-[0_0_0_1px_rgb(0_0_0_/_8%)]"
+                          className="h-4 w-5.5 rounded-[2px]"
                           onError={(event) => {
                             event.currentTarget.style.display = "none";
                           }}
