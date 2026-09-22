@@ -127,6 +127,10 @@ const REGION_TO_ISO_NUMERIC: Record<string, string> = {
   azerbaijan: "031",
 };
 
+// Countries in REGION_TO_ISO_NUMERIC above whose alpha-2 code previously had
+// no entry below (kh/la/mm/bd/pk/kz/uz/ge/am/az) are included here too, so
+// both the world-map coloring and the flag icon lookup can resolve them.
+
 const ISO_A2_TO_NUMERIC: Record<string, string> = {
   HK: "344",
   CN: "156",
@@ -177,6 +181,16 @@ const ISO_A2_TO_NUMERIC: Record<string, string> = {
   LU: "442",
   IL: "376",
   SA: "682",
+  KH: "116",
+  LA: "418",
+  MM: "104",
+  BD: "050",
+  PK: "586",
+  KZ: "398",
+  UZ: "860",
+  GE: "268",
+  AM: "051",
+  AZ: "031",
 };
 
 const ISO_NUMERIC_TO_A2 = Object.fromEntries(
@@ -207,6 +221,15 @@ function flagEmojiToIsoA2(region: string): string | null {
   return String.fromCharCode(first - 0x1f1e6 + 65, second - 0x1f1e6 + 65);
 }
 
+/**
+ * True when the region string is itself a flag emoji (two regional-indicator
+ * code points), so callers can avoid showing it as redundant text next to
+ * the rendered SVG flag icon.
+ */
+export function isRegionFlagEmoji(region: string): boolean {
+  return flagEmojiToIsoA2(region.trim()) !== null;
+}
+
 export function regionToIsoNumeric(region: string): string | null {
   const trimmed = region.trim();
   if (!trimmed) {
@@ -227,16 +250,37 @@ export function regionToIsoNumeric(region: string): string | null {
   return mapped ?? null;
 }
 
-export function regionToFlagEmoji(region: string): string | null {
-  const numeric = regionToIsoNumeric(region);
-  if (!numeric) {
+/**
+ * Resolves a region string (flag emoji, ISO alpha-2 code, or country name)
+ * to an ISO 3166-1 alpha-2 code, independent of whether that code happens
+ * to be present in ISO_A2_TO_NUMERIC (the map-coloring table).
+ */
+export function regionToIsoAlpha2(region: string): string | null {
+  const trimmed = region.trim();
+  if (!trimmed) {
     return null;
   }
-  const alpha2 = ISO_NUMERIC_TO_A2[numeric];
-  if (!alpha2) {
-    return null;
+  const fromFlag = flagEmojiToIsoA2(trimmed);
+  if (fromFlag) {
+    return fromFlag;
   }
-  return [...alpha2]
-    .map((char) => String.fromCodePoint(char.charCodeAt(0) + 0x1f1a5))
-    .join("");
+  if (/^[A-Za-z]{2}$/.test(trimmed)) {
+    return trimmed.toUpperCase();
+  }
+  const numeric = regionToIsoNumeric(trimmed);
+  if (numeric && ISO_NUMERIC_TO_A2[numeric]) {
+    return ISO_NUMERIC_TO_A2[numeric];
+  }
+  return null;
+}
+
+/**
+ * Path to the bundled colored SVG flag for a region, served from
+ * /public/assets/flags. Returns null when no region info is available;
+ * callers should fall back to a placeholder icon and/or handle the
+ * <img> onError case for alpha-2 codes that aren't bundled locally.
+ */
+export function regionToFlagIconSrc(region: string): string | null {
+  const alpha2 = regionToIsoAlpha2(region);
+  return alpha2 ? `/assets/flags/${alpha2.toLowerCase()}.svg` : null;
 }
