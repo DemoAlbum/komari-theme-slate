@@ -1,11 +1,11 @@
 import {
-  Radio,
-  Server,
+  ArrowDownWideNarrow,
   ArrowUpDown,
   ArrowUpNarrowWide,
-  ArrowDownWideNarrow,
-  CircleChevronUp,
   CircleChevronDown,
+  CircleChevronUp,
+  Radio,
+  Server,
 } from "lucide-react";
 import { formatBytes, formatSpeed } from "@/lib/format";
 import { t } from "@/lib/i18n";
