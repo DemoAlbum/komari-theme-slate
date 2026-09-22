@@ -18,6 +18,7 @@ import { Separator } from "@/components/ui/separator";
 import { formatBytes, formatSpeed } from "@/lib/format";
 import { t } from "@/lib/i18n";
 import type { NodeRow } from "@/lib/nodes";
+import { systemIconSrc } from "@/lib/os-icon";
 import { regionToFlagIconSrc } from "@/lib/region";
 import { tagTone } from "@/lib/tag";
 import { trafficPercent, trafficTone } from "@/lib/traffic";
@@ -296,7 +297,7 @@ export function NodeCards({
                           alt=""
                           loading="lazy"
                           decoding="async"
-                          className="h-4 w-5.5 rounded-[2px] object-cover shadow-[0_0_0_1px_rgb(0_0_0_/_8%)]"
+                          className="h-4 w-5.5 rounded-[2px]"
                           onError={(event) => {
                             event.currentTarget.style.display = "none";
                           }}
@@ -305,6 +306,26 @@ export function NodeCards({
                         <MapPin className="size-4 text-muted-foreground" />
                       )}
                     </span>
+                    {row.client.os ? (
+                      <span
+                        className="flex h-5 w-5 shrink-0 items-center justify-center"
+                        role="img"
+                        aria-label={row.client.os}
+                        title={row.client.os}
+                      >
+                        <img
+                          src={systemIconSrc(row.client.os)}
+                          alt=""
+                          loading="lazy"
+                          decoding="async"
+                          className="h-5 w-5"
+                          onError={(event) => {
+                            event.currentTarget.src =
+                              "/assets/os-icons/tux.svg";
+                          }}
+                        />
+                      </span>
+                    ) : null}
                     <span className="min-w-0">
                       <span className="block truncate text-sm font-semibold">
                         {row.name}
