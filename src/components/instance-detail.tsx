@@ -1,6 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import { Link } from "@tanstack/react-router";
-import { LineChart } from "echarts/charts";
+import { BarChart, LineChart } from "echarts/charts";
 import {
   GridComponent,
   LegendComponent,
@@ -32,6 +32,7 @@ import { cn } from "@/lib/utils";
 
 echarts.use([
   LineChart,
+  BarChart,
   GridComponent,
   LegendComponent,
   TooltipComponent,
