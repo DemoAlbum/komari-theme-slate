@@ -20,7 +20,7 @@ import { cn } from "@/lib/utils";
 const columnHelper = legacyCreateColumnHelper<NodeRow>();
 
 const TABLE_COLUMNS = [
-  { id: "name", width: 160, setting: "showTableName" },
+  { id: "name", width: 120, setting: "showTableName" },
   { id: "online", width: 60, setting: "showTableStatus" },
   { id: "system", width: 60, setting: "showTableSystem" },
   { id: "uptime", width: 90, setting: "showTableUptime" },
