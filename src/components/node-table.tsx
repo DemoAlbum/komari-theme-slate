@@ -12,6 +12,7 @@ import { Progress } from "@/components/ui/progress";
 import { formatBytes, formatSpeed } from "@/lib/format";
 import { t } from "@/lib/i18n";
 import type { NodeRow } from "@/lib/nodes";
+import { systemIconSrc } from "@/lib/os-icon";
 import { regionToFlagIconSrc } from "@/lib/region";
 import type { ThemeSettings } from "@/lib/schemas";
 import { trafficPercent, trafficTone } from "@/lib/traffic";
@@ -27,67 +28,10 @@ const TABLE_COLUMNS = [
   { id: "cpuUsage", width: 100, setting: "showTableCpu" },
   { id: "memoryUsage", width: 100, setting: "showTableMemory" },
   { id: "diskUsage", width: 100, setting: "showTableDisk" },
-  { id: "speed", width: 120, setting: "showTableSpeed" },
-  { id: "traffic", width: 130, setting: "showTableTraffic" },
+  { id: "speed", width: 100, setting: "showTableSpeed" },
+  { id: "traffic", width: 100, setting: "showTableTraffic" },
   { id: "ping", width: 160, setting: "showTablePing" },
 ] as const;
-
-const SYSTEM_ICON_MAPPINGS = [
-  ["almalinux", "almalinux"],
-  ["alpine", "alpine"],
-  ["archcraft", "archcraft"],
-  ["archlabs", "archlabs"],
-  ["arcolinux", "arcolinux"],
-  ["arch", "arch"],
-  ["artix", "artix"],
-  ["centos", "centos"],
-  ["coreos", "coreos"],
-  ["debian", "debian"],
-  ["deepin", "deepin"],
-  ["devuan", "devuan"],
-  ["elementary", "elementary"],
-  ["endeavour", "endeavour"],
-  ["fedora", "fedora"],
-  ["freebsd", "freebsd"],
-  ["garuda", "garuda"],
-  ["gentoo", "gentoo"],
-  ["kali", "kali"],
-  ["kubuntu", "kubuntu"],
-  ["linux mint", "linuxmint"],
-  ["mageia", "mageia"],
-  ["mandriva", "mandriva"],
-  ["manjaro", "manjaro"],
-  ["mx linux", "mxlinux"],
-  ["nixos", "nixos"],
-  ["nobara", "nobara"],
-  ["openbsd", "openbsd"],
-  ["opensuse", "opensuse"],
-  ["pop!_os", "popos"],
-  ["pop os", "popos"],
-  ["raspbian", "raspberrypi"],
-  ["raspberry", "raspberrypi"],
-  ["red hat", "redhat"],
-  ["redhat", "redhat"],
-  ["rocky", "rockylinux"],
-  ["slackware", "slackware"],
-  ["solus", "solus"],
-  ["windows", "windows"],
-  ["ubuntu", "ubuntu"],
-  ["void", "void"],
-  ["zorin", "zorin"],
-  ["darwin", "apple"],
-  ["macos", "apple"],
-  ["mac os", "apple"],
-] as const;
-
-/** Resolves an OS string to the bundled colored SVG icon under /assets/os-icons. */
-function systemIconSrc(system: string) {
-  const normalized = system.toLowerCase();
-  const key =
-    SYSTEM_ICON_MAPPINGS.find(([name]) => normalized.includes(name))?.[1] ??
-    "tux";
-  return `/assets/os-icons/${key}.svg`;
-}
 
 function NetworkCell({ down, up }: { down: string; up: string }) {
   return (
@@ -201,7 +145,7 @@ export function NodeTable({
                     alt=""
                     loading="lazy"
                     decoding="async"
-                    className="h-3.5 w-5 rounded-[2px] object-cover shadow-[0_0_0_1px_rgb(0_0_0_/_8%)]"
+                    className="h-3.5 w-5 rounded-[2px]"
                     onError={(event) => {
                       event.currentTarget.style.display = "none";
                     }}
