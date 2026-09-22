@@ -5,14 +5,14 @@ import {
   useLegacyTable,
 } from "@tanstack/react-table/legacy";
 import { Server } from "lucide-react";
-import { type ReactNode, useEffect, useMemo } from "react";
+import { type ReactNode, useMemo } from "react";
 import { LiveUptime } from "@/components/live-uptime";
 import { NodePing } from "@/components/node-ping";
 import { Progress } from "@/components/ui/progress";
 import { formatBytes, formatSpeed } from "@/lib/format";
 import { t } from "@/lib/i18n";
 import type { NodeRow } from "@/lib/nodes";
-import { regionToFlagEmoji } from "@/lib/region";
+import { regionToFlagIconSrc } from "@/lib/region";
 import type { ThemeSettings } from "@/lib/schemas";
 import { trafficPercent, trafficTone } from "@/lib/traffic";
 import { cn } from "@/lib/utils";
@@ -33,58 +33,60 @@ const TABLE_COLUMNS = [
 ] as const;
 
 const SYSTEM_ICON_MAPPINGS = [
-  ["almalinux", "fl-almalinux"],
-  ["alpine", "fl-alpine"],
-  ["archcraft", "fl-archcraft"],
-  ["archlabs", "fl-archlabs"],
-  ["arcolinux", "fl-arcolinux"],
-  ["arch", "fl-archlinux"],
-  ["artix", "fl-artix"],
-  ["centos", "fl-centos"],
-  ["coreos", "fl-coreos"],
-  ["debian", "fl-debian"],
-  ["deepin", "fl-deepin"],
-  ["devuan", "fl-devuan"],
-  ["elementary", "fl-elementary"],
-  ["endeavour", "fl-endeavour"],
-  ["fedora", "fl-fedora"],
-  ["freebsd", "fl-freebsd"],
-  ["garuda", "fl-garuda"],
-  ["gentoo", "fl-gentoo"],
-  ["kali", "fl-kali-linux"],
-  ["kubuntu", "fl-kubuntu"],
-  ["linux mint", "fl-linuxmint"],
-  ["mageia", "fl-mageia"],
-  ["mandriva", "fl-mandriva"],
-  ["manjaro", "fl-manjaro"],
-  ["mx linux", "fl-mxlinux"],
-  ["nixos", "fl-nixos"],
-  ["nobara", "fl-nobara"],
-  ["openbsd", "fl-openbsd"],
-  ["opensuse", "fl-opensuse"],
-  ["pop!_os", "fl-pop-os"],
-  ["pop os", "fl-pop-os"],
-  ["raspbian", "fl-raspberry-pi"],
-  ["raspberry", "fl-raspberry-pi"],
-  ["red hat", "fl-redhat"],
-  ["redhat", "fl-redhat"],
-  ["rocky", "fl-rocky-linux"],
-  ["slackware", "fl-slackware"],
-  ["solus", "fl-solus"],
-  ["ubuntu", "fl-ubuntu"],
-  ["void", "fl-void"],
-  ["zorin", "fl-zorin"],
-  ["darwin", "fl-apple"],
-  ["macos", "fl-apple"],
-  ["mac os", "fl-apple"],
+  ["almalinux", "almalinux"],
+  ["alpine", "alpine"],
+  ["archcraft", "archcraft"],
+  ["archlabs", "archlabs"],
+  ["arcolinux", "arcolinux"],
+  ["arch", "arch"],
+  ["artix", "artix"],
+  ["centos", "centos"],
+  ["coreos", "coreos"],
+  ["debian", "debian"],
+  ["deepin", "deepin"],
+  ["devuan", "devuan"],
+  ["elementary", "elementary"],
+  ["endeavour", "endeavour"],
+  ["fedora", "fedora"],
+  ["freebsd", "freebsd"],
+  ["garuda", "garuda"],
+  ["gentoo", "gentoo"],
+  ["kali", "kali"],
+  ["kubuntu", "kubuntu"],
+  ["linux mint", "linuxmint"],
+  ["mageia", "mageia"],
+  ["mandriva", "mandriva"],
+  ["manjaro", "manjaro"],
+  ["mx linux", "mxlinux"],
+  ["nixos", "nixos"],
+  ["nobara", "nobara"],
+  ["openbsd", "openbsd"],
+  ["opensuse", "opensuse"],
+  ["pop!_os", "popos"],
+  ["pop os", "popos"],
+  ["raspbian", "raspberrypi"],
+  ["raspberry", "raspberrypi"],
+  ["red hat", "redhat"],
+  ["redhat", "redhat"],
+  ["rocky", "rockylinux"],
+  ["slackware", "slackware"],
+  ["solus", "solus"],
+  ["windows", "windows"],
+  ["ubuntu", "ubuntu"],
+  ["void", "void"],
+  ["zorin", "zorin"],
+  ["darwin", "apple"],
+  ["macos", "apple"],
+  ["mac os", "apple"],
 ] as const;
 
-function systemIconClass(system: string) {
+/** Resolves an OS string to the bundled colored SVG icon under /assets/os-icons. */
+function systemIconSrc(system: string) {
   const normalized = system.toLowerCase();
-  return (
+  const key =
     SYSTEM_ICON_MAPPINGS.find(([name]) => normalized.includes(name))?.[1] ??
-    "fl-tux"
-  );
+    "tux";
+  return `/assets/os-icons/${key}.svg`;
 }
 
 function NetworkCell({ down, up }: { down: string; up: string }) {
@@ -176,22 +178,12 @@ export function NodeTable({
   showUptime: boolean;
   settings?: ThemeSettings;
 }) {
-  useEffect(() => {
-    const stylesheet = document.querySelector<HTMLLinkElement>(
-      "#font-logos-stylesheet",
-    );
-    const href = stylesheet?.dataset.href;
-    if (stylesheet && href && !stylesheet.hasAttribute("href")) {
-      stylesheet.href = href;
-    }
-  }, []);
-
   const columns = useMemo(
     () => [
       columnHelper.accessor("name", {
         header: t("colName"),
         cell: (info) => {
-          const flag = regionToFlagEmoji(info.row.original.region);
+          const flag = regionToFlagIconSrc(info.row.original.region);
           return (
             <Link
               to="/instance/$uuid"
@@ -200,10 +192,23 @@ export function NodeTable({
               className="inline-flex max-w-full min-w-0 items-center gap-2 font-medium text-foreground hover:text-data-accent"
             >
               <span
-                className="flex size-5 shrink-0 items-center justify-center text-base"
+                className="flex size-5 shrink-0 items-center justify-center"
                 aria-hidden="true"
               >
-                {flag ?? <Server className="size-3.5 text-muted-foreground" />}
+                {flag ? (
+                  <img
+                    src={flag}
+                    alt=""
+                    loading="lazy"
+                    decoding="async"
+                    className="h-3.5 w-5 rounded-[2px] object-cover shadow-[0_0_0_1px_rgb(0_0_0_/_8%)]"
+                    onError={(event) => {
+                      event.currentTarget.style.display = "none";
+                    }}
+                  />
+                ) : (
+                  <Server className="size-3.5 text-muted-foreground" />
+                )}
               </span>
               <span className="truncate">{info.getValue()}</span>
             </Link>
@@ -237,27 +242,21 @@ export function NodeTable({
           const system = info.getValue();
           return system ? (
             <span
-              className="inline-flex size-6 items-center justify-center text-base text-muted-foreground"
+              className="inline-flex size-6 items-center justify-center text-muted-foreground"
               role="img"
               aria-label={system}
               title={system}
             >
-              {system.toLowerCase().includes("windows") ? (
-                <span
-                  className="grid size-3.5 grid-cols-2 grid-rows-2 gap-px"
-                  aria-hidden="true"
-                >
-                  <span className="bg-current" />
-                  <span className="bg-current" />
-                  <span className="bg-current" />
-                  <span className="bg-current" />
-                </span>
-              ) : (
-                <i
-                  className={cn("fl-fw", systemIconClass(system))}
-                  aria-hidden="true"
-                />
-              )}
+              <img
+                src={systemIconSrc(system)}
+                alt=""
+                loading="lazy"
+                decoding="async"
+                className="size-4"
+                onError={(event) => {
+                  event.currentTarget.src = "/assets/os-icons/tux.svg";
+                }}
+              />
             </span>
           ) : (
             <span className="text-muted-foreground">—</span>
