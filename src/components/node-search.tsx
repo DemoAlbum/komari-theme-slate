@@ -13,7 +13,7 @@ import {
 } from "@/components/ui/dialog";
 import { useNodeStatus, useNodes } from "@/hooks/use-komari";
 import { t } from "@/lib/i18n";
-import { regionToFlagEmoji } from "@/lib/region";
+import { regionToFlagIconSrc } from "@/lib/region";
 import type { Client } from "@/lib/schemas";
 import { cn } from "@/lib/utils";
 
@@ -119,7 +119,7 @@ export function NodeSearch({
             <Autocomplete.List className="ui-scroll max-h-80 scroll-py-1 px-2 pb-2 outline-none">
               {(client: Client) => {
                 const online = status.data?.[client.uuid]?.online ?? false;
-                const flag = regionToFlagEmoji(client.region);
+                const flag = regionToFlagIconSrc(client.region);
                 return (
                   <Autocomplete.Item
                     key={client.uuid}
@@ -129,7 +129,17 @@ export function NodeSearch({
                   >
                     <span className="flex size-9 shrink-0 items-center justify-center rounded-lg border bg-card text-base shadow-xs">
                       {flag ? (
-                        <span aria-hidden="true">{flag}</span>
+                        <img
+                          src={flag}
+                          alt=""
+                          aria-hidden="true"
+                          loading="lazy"
+                          decoding="async"
+                          className="h-4 w-5.5 rounded-[2px] object-cover shadow-[0_0_0_1px_rgb(0_0_0_/_8%)]"
+                          onError={(event) => {
+                            event.currentTarget.style.display = "none";
+                          }}
+                        />
                       ) : (
                         <MapPin className="size-4 text-muted-foreground" />
                       )}
