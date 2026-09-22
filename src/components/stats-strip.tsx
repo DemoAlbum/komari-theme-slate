@@ -29,7 +29,15 @@ function StatCard({
 }) {
   const className = cn(
     "group h-28 min-w-0 rounded-lg border border-border bg-card p-4 text-left transition-colors hover:border-foreground/20",
-    active && "border-data-accent bg-data-accent/5 ring-1 ring-data-accent/20",
+    active &&
+      tone === "green" &&
+      "border-status-online bg-status-online/5 ring-1 ring-status-online/20",
+    active &&
+      tone === "red" &&
+      "border-status-offline bg-status-offline/5 ring-1 ring-status-offline/20",
+    active &&
+      (tone === "blue" || tone === "neutral") &&
+      "border-data-accent bg-data-accent/5 ring-1 ring-data-accent/20",
     onClick && "cursor-pointer",
   );
   const content = (
