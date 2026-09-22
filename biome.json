@@ -11,7 +11,9 @@
       "!**/dist",
       "!**/node_modules",
       "!**/src/routeTree.gen.ts",
-      "!**/src/data/countries-110m.json"
+      "!**/src/data/countries-110m.json",
+      "!**/public/assets/flags",
+      "!**/public/assets/os-icons"
     ]
   },
   "formatter": {
