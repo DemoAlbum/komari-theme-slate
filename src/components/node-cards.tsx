@@ -18,7 +18,7 @@ import { Separator } from "@/components/ui/separator";
 import { formatBytes, formatSpeed } from "@/lib/format";
 import { t } from "@/lib/i18n";
 import type { NodeRow } from "@/lib/nodes";
-import { regionToFlagEmoji } from "@/lib/region";
+import { regionToFlagIconSrc } from "@/lib/region";
 import { tagTone } from "@/lib/tag";
 import { trafficPercent, trafficTone } from "@/lib/traffic";
 import { cn } from "@/lib/utils";
@@ -245,7 +245,7 @@ export function NodeCards({
   return (
     <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
       {rows.map((row, index) => {
-        const flag = regionToFlagEmoji(row.region);
+        const flag = regionToFlagIconSrc(row.region);
         const memoryTotal = row.status?.ram_total || row.client.mem_total;
         const diskTotal = row.status?.disk_total || row.client.disk_total;
         const swapTotal = row.status?.swap_total || row.client.swap_total;
@@ -286,11 +286,22 @@ export function NodeCards({
                 <CardTitle className="flex items-start justify-between gap-3">
                   <span className="flex min-w-0 items-start gap-2.5">
                     <span
-                      className="flex h-5 w-7 shrink-0 items-center justify-center text-lg leading-5"
+                      className="flex h-5 w-7 shrink-0 items-center justify-center"
                       role="img"
                       aria-label={row.region || t("colRegion")}
                     >
-                      {flag ?? (
+                      {flag ? (
+                        <img
+                          src={flag}
+                          alt=""
+                          loading="lazy"
+                          decoding="async"
+                          className="h-4 w-5.5 rounded-[2px] object-cover shadow-[0_0_0_1px_rgb(0_0_0_/_8%)]"
+                          onError={(event) => {
+                            event.currentTarget.style.display = "none";
+                          }}
+                        />
+                      ) : (
                         <MapPin className="size-4 text-muted-foreground" />
                       )}
                     </span>
