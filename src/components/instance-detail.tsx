@@ -715,7 +715,7 @@ function PingChart({
             type: "bar",
             yAxisIndex: 1,
             data: service.lossSeries,
-            barMaxWidth: 6,
+            barMaxWidth: 2,
             itemStyle: { color: service.color, opacity: 0.55 },
             emphasis: { disabled: true },
           },
